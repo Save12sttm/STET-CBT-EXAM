@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test History - STET 2025</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: white; border-radius: 15px; padding: 30px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .header h1 { color: #1e3c72; margin-bottom: 10px; }
+        .header p { color: #666; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 3px 15px rgba(0,0,0,0.1); text-align: center; transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card h3 { color: #667eea; font-size: 36px; margin-bottom: 10px; }
+        .stat-card p { color: #666; font-size: 14px; }
+        .best-score { color: #4caf50; }
+        .filter-section { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 16px; border: 2px solid #667eea; background: white; color: #667eea; border-radius: 20px; cursor: pointer; transition: all 0.3s; }
+        .filter-btn.active, .filter-btn:hover { background: #667eea; color: white; }
+        .search-box { padding: 10px; border: 2px solid #ddd; border-radius: 8px; width: 200px; }
+        .pagination { text-align: center; margin-top: 20px; }
+        .page-btn { padding: 8px 12px; margin: 0 2px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 4px; }
+        .page-btn.active { background: #667eea; color: white; }
+        .progress-bar { width: 100%; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; margin: 5px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f44336, #ff9800, #4caf50); transition: width 0.3s; }
+
+        .stat-card { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 3px 15px rgba(0,0,0,0.1); text-align: center; }
+        .stat-card h3 { color: #667eea; font-size: 36px; margin-bottom: 10px; }
+        .stat-card p { color: #666; font-size: 14px; }
+y-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .history-section h2 { color: #1e3c72; margin-bottom: 20px; }
+        .history-table { width: 100%; border-collapse: collapse; }
+        .history-table th { background: #667eea; color: white; padding: 15px; text-align: left; font-size: 14px; }
+        .history-table td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .history-table tr:hover { background: #f8f9fa; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .badge-paper1 { background: #e3f2fd; color: #1976d2; }
+        .badge-paper2 { background: #f3e5f5; color: #7b1fa2; }
+        .score-good { color: #4caf50; font-weight: bold; }
+        .score-avg { color: #ff9800; font-weight: bold; }
+        .score-low { color: #f44336; font-weight: bold; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin: 5px; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .empty-state { text-align: center; padding: 50px; color: #999; }
+        .empty-state h3 { margin-bottom: 10px; }
+        .actions { margin-top: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Test History</h1>
+            <p id="candidateInfo">Loading...</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalTests">0</h3>
+                <p>Total Tests Taken</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="paper1Tests">0</h3>
+                <p>Paper-I Attempts</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="paper2Tests">0</h3>
+                <p>Paper-II Attempts</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="avgScore">0%</h3>
+                <p>Average Score</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="bestScore" class="best-score">0%</h3>
+                <p>Best Score</p>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h2>Test Attempts</h2>
+            <div class="filter-section">
+                <button class="filter-btn active" onclick="filterTests('all')">All Tests</button>
+                <button class="filter-btn" onclick="filterTests('Paper-I')">Paper-I Only</button>
+                <button class="filter-btn" onclick="filterTests('Paper-II')">Paper-II Only</button>
+                <input type="text" class="search-box" placeholder="Search by date or score..." onkeyup="searchTests(this.value)">
+                <select onchange="sortTests(this.value)" style="padding: 8px; border-radius: 4px;">
+                    <option value="date-desc">Latest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="score-desc">Highest Score</option>
+                    <option value="score-asc">Lowest Score</option>
+                </select>
+            </div>
+            <table class="history-table" id="historyTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date & Time</th>
+                        <th>Paper</th>
+                        <th>Set</th>
+                        <th>Score</th>
+                        <th>Correct</th>
+                        <th>Wrong</th>
+                        <th>Not Answered</th>
+                        <th>Percentage</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                    <tr><td colspan="9" class="empty-state"><h3>No test history found</h3><p>Start taking tests to see your history</p></td></tr>
+                </tbody>
+            </table>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="window.location.href='paper_selection.html'">Take New Test</button>
+                <button class="btn btn-primary" onclick="restoreBackup()">🔄 Restore Backup</button>
+                <button class="btn btn-danger" onclick="clearHistory()">Clear History</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadCandidateInfo() {
+            const candidateName = sessionStorage.getItem('candidateName') || 'Guest User';
+            const rollNumber = sessionStorage.getItem('rollNumber') || 'N/A';
+            const applicationNumber = sessionStorage.getItem('applicationNumber') || 'N/A';
+            
+            document.getElementById('candidateInfo').textContent = `${candidateName} | Roll: ${rollNumber} | App: ${applicationNumber}`;
+            document.title = `Test History - ${candidateName}`;
+        }
+
+        function loadHistory() {
+            try {
+                const history = JSON.parse(localStorage.getItem('testHistory') || '[]');
+                
+                if (history.length === 0) {
+                    showEmptyState();
+                    return;
+                }
+                
+                const paper1Count = history.filter(h => h.paper === 'Paper-I').length;
+                const paper2Count = history.filter(h => h.paper === 'Paper-II').length;
+                const avgScore = Math.round(history.reduce((sum, h) => sum + h.percentage, 0) / history.length);
+                const bestScore = Math.max(...history.map(h => h.percentage));
+
+                document.getElementById('totalTests').textContent = history.length;
+                document.getElementById('paper1Tests').textContent = paper1Count;
+                document.getElementById('paper2Tests').textContent = paper2Count;
+                document.getElementById('avgScore').textContent = avgScore + '%';
+                document.getElementById('bestScore').textContent = bestScore + '%';
+
+                window.allHistory = history;
+                window.filteredHistory = [...history];
+                renderTable();
+            } catch (error) {
+                console.error('Failed to load history:', error);
+                showErrorState();
+            }
+        }
+        
+        function showEmptyState() {
+            const tbody = document.getElementById('historyBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="empty-state">
+                        <h3>📊 No Test History Found</h3>
+                        <p>You haven't taken any tests yet. Start with your first exam!</p>
+                        <button class="btn btn-primary" onclick="window.location.href='paper_selection.html'" style="margin-top: 15px;">Take Your First Test</button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        function showErrorState() {
+            const tbody = document.getElementById('historyBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="empty-state">
+                        <h3>⚠️ Error Loading History</h3>
+                        <p>There was an error loading your test history. Please try refreshing the page.</p>
+                        <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 15px;">Refresh Page</button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        function getSetDisplayName(set) {
+            const setNames = {
+                'set1': 'Set 1',
+                'newset': 'Set 2',
+                'set3': 'Set 3',
+                'set4': 'Set 4',
+                'set5': 'Set 5',
+                'set6': 'Set 6',
+                'set7': 'Set 7'
+            };
+            return setNames[set] || set.toUpperCase();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('historyBody');
+            const history = window.filteredHistory || [];
+            
+            if (history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="empty-state"><h3>No matching tests found</h3></td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = history.map((h, i) => {
+                const scoreClass = h.percentage >= 60 ? 'score-good' : h.percentage >= 40 ? 'score-avg' : 'score-low';
+                const badgeClass = h.paper === 'Paper-I' ? 'badge-paper1' : 'badge-paper2';
+                const grade = h.grade || (h.percentage >= 60 ? 'A' : h.percentage >= 50 ? 'B' : h.percentage >= 40 ? 'C' : 'F');
+                const duration = h.examDuration ? formatDuration(h.examDuration) : 'N/A';
+                
+                return `
+                    <tr data-paper="${h.paper}" data-score="${h.percentage}" data-date="${h.timestamp}">
+                        <td>${i + 1}</td>
+                        <td>${new Date(h.timestamp).toLocaleString()}<br><small style="color: #999;">${duration}</small></td>
+                        <td><span class="badge ${badgeClass}">${h.paper}</span></td>
+                        <td>${getSetDisplayName(h.set)}</td>
+                        <td class="${scoreClass}">
+                            ${h.correct}/150
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${h.percentage}%"></div>
+                            </div>
+                        </td>
+                        <td>${h.correct}</td>
+                        <td>${h.wrong}</td>
+                        <td>${h.notAnswered}</td>
+                        <td class="${scoreClass}">${h.percentage}% (${grade})</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 11px; margin: 2px;" onclick="viewDetails(${window.allHistory.indexOf(h)})">View</button>
+                            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 11px; margin: 2px;" onclick="deleteTest(${window.allHistory.indexOf(h)})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).reverse().join('');
+        }
+        
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+        }
+        
+        function filterTests(type) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (type === 'all') {
+                window.filteredHistory = [...window.allHistory];
+            } else {
+                window.filteredHistory = window.allHistory.filter(h => h.paper === type);
+            }
+            renderTable();
+        }
+        
+        function searchTests(query) {
+            if (!query.trim()) {
+                window.filteredHistory = [...window.allHistory];
+            } else {
+                const searchTerm = query.toLowerCase();
+                window.filteredHistory = window.allHistory.filter(h => 
+                    new Date(h.timestamp).toLocaleString().toLowerCase().includes(searchTerm) ||
+                    h.percentage.toString().includes(searchTerm) ||
+                    h.paper.toLowerCase().includes(searchTerm) ||
+                    getSetDisplayName(h.set).toLowerCase().includes(searchTerm)
+                );
+            }
+            renderTable();
+        }
+        
+        function sortTests(sortBy) {
+            switch(sortBy) {
+                case 'date-desc':
+                    window.filteredHistory.sort((a, b) => b.timestamp - a.timestamp);
+                    break;
+                case 'date-asc':
+                    window.filteredHistory.sort((a, b) => a.timestamp - b.timestamp);
+                    break;
+                case 'score-desc':
+                    window.filteredHistory.sort((a, b) => b.percentage - a.percentage);
+                    break;
+                case 'score-asc':
+                    window.filteredHistory.sort((a, b) => a.percentage - b.percentage);
+                    break;
+            }
+            renderTable();
+        }
+
+        function clearHistory() {
+            const history = JSON.parse(localStorage.getItem('testHistory') || '[]');
+            
+            if (history.length === 0) {
+                alert('No test history to clear.');
+                return;
+            }
+            
+            const confirmMsg = `Are you sure you want to clear all test history?\n\nThis will permanently delete ${history.length} test record(s).\n\nThis action cannot be undone.`;
+            
+            if (confirm(confirmMsg)) {
+                const backup = {
+                    data: history,
+                    timestamp: Date.now(),
+                    candidateName: sessionStorage.getItem('candidateName')
+                };
+                localStorage.setItem('testHistoryBackup', JSON.stringify(backup));
+                
+                localStorage.removeItem('testHistory');
+                alert('✅ Test history cleared successfully.\n\nA backup has been created in case you need to restore it.');
+                location.reload();
+            }
+        }
+        
+        function deleteTest(index) {
+            const history = JSON.parse(localStorage.getItem('testHistory') || '[]');
+            const test = history[index];
+            
+            if (confirm(`Delete this test record?\n\nPaper: ${test.paper}\nScore: ${test.correct}/150 (${test.percentage}%)\nDate: ${new Date(test.timestamp).toLocaleString()}`)) {
+                history.splice(index, 1);
+                localStorage.setItem('testHistory', JSON.stringify(history));
+                loadHistory();
+            }
+        }
+        
+        function restoreBackup() {
+            const backup = localStorage.getItem('testHistoryBackup');
+            
+            if (!backup) {
+                alert('No backup found.');
+                return;
+            }
+            
+            try {
+                const backupData = JSON.parse(backup);
+                const backupDate = new Date(backupData.timestamp).toLocaleString();
+                const recordCount = backupData.data.length;
+                
+                if (confirm(`Restore backup from ${backupDate}?\n\nThis will restore ${recordCount} test records.\nCurrent history will be overwritten.`)) {
+                    localStorage.setItem('testHistory', JSON.stringify(backupData.data));
+                    alert('✅ Backup restored successfully!');
+                    location.reload();
+                }
+            } catch (error) {
+                alert('❌ Error restoring backup: Invalid backup data.');
+            }
+        }
+        
+        function viewDetails(index) {
+            const history = JSON.parse(localStorage.getItem('testHistory') || '[]');
+            const test = history[index];
+            
+            sessionStorage.setItem('viewHistoryData', JSON.stringify(test));
+            
+            if (test.paper === 'Paper-I') {
+                sessionStorage.setItem('paper1Correct', test.correct);
+                sessionStorage.setItem('paper1Wrong', test.wrong);
+                sessionStorage.setItem('paper1NotAnswered', test.notAnswered);
+                sessionStorage.setItem('selectedSet', test.set);
+                if (test.userAnswers) sessionStorage.setItem('paper1UserAnswers', JSON.stringify(test.userAnswers));
+                window.location.href = 'paper1_result.html?history=true';
+            } else {
+                sessionStorage.setItem('paper2Correct', test.correct);
+                sessionStorage.setItem('paper2Wrong', test.wrong);
+                sessionStorage.setItem('paper2NotAnswered', test.notAnswered);
+                sessionStorage.setItem('selectedSet', test.set);
+                if (test.userAnswers) sessionStorage.setItem('paper2UserAnswers', JSON.stringify(test.userAnswers));
+                window.location.href = 'paper2_result.html?history=true';
+            }
+        }
+
+        function initializePage() {
+            if (sessionStorage.getItem('loggedIn') !== 'true') {
+                alert('Please login first!');
+                window.location.href = 'stet_login.html';
+                return;
+            }
+            
+            loadCandidateInfo();
+            loadHistory();
+        }
+        
+        initializePage();
+    </script>
+</body>
+</html>
+

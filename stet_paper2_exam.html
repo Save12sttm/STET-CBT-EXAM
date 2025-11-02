@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STET 2025 - Paper-II Exam</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; overflow-x: hidden; }
+
+        /* Progress Bar */
+        .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 5px; background: rgba(255,255,255,0.3); z-index: 101; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #4caf50, #66bb6a); width: 0%; transition: width 0.3s ease; }
+
+        /* Header */
+        .exam-header { background: linear-gradient(135deg, #2a5298, #1e3c72); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100; }
+        .candidate-info h2 { font-size: 16px; margin-bottom: 5px; }
+        .candidate-info p { font-size: 12px; opacity: 0.9; }
+        
+        .progress-stats { text-align: center; color: white; }
+        .progress-percentage { font-size: 24px; font-weight: bold; color: #66bb6a; }
+        .progress-label { font-size: 11px; opacity: 0.8; }
+
+        .timer-section { text-align: right; }
+        .timer { font-size: 32px; font-weight: bold; color: #ffeb3b; font-family: 'Courier New', monospace; }
+        .timer-label { font-size: 11px; opacity: 0.8; }
+
+        /* Language Toggle */
+        .language-toggle { position: absolute; top: 15px; right: 200px; display: flex; gap: 8px; align-items: center; }
+        .lang-btn { padding: 6px 15px; border: 2px solid white; background: transparent; color: white; border-radius: 15px; cursor: pointer; font-weight: bold; transition: all 0.3s; font-size: 12px; }
+        .lang-btn.active { background: white; color: #2a5298; }
+        .lang-btn:hover { transform: scale(1.05); }
+
+        /* Main Container */
+        .exam-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; padding: 20px; max-width: 1400px; margin: 0 auto; }
+
+        /* Question Area */
+        .question-area { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e0e0e0; }
+        .question-number { font-size: 18px; font-weight: bold; color: #2a5298; }
+        .subject-tag { background: #764ba2; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; }
+
+        .question-text { font-size: 18px; color: #333; margin-bottom: 25px; line-height: 1.8; }
+        .question-english { margin-bottom: 15px; }
+        .question-hindi { color: #555; font-size: 17px; padding-top: 15px; border-top: 2px dashed #ddd; }
+
+        .options { display: flex; flex-direction: column; gap: 15px; }
+        .option { background: #f8f9fa; border: 2px solid #ddd; padding: 15px 20px; border-radius: 8px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 15px; }
+        .option:hover { background: #e3f2fd; border-color: #2196F3; }
+        .option.selected { background: #c8e6c9; border-color: #4caf50; font-weight: bold; }
+        .option input[type="radio"] { width: 20px; height: 20px; cursor: pointer; }
+        .option label { cursor: pointer; flex: 1; font-size: 16px; }
+
+        /* Navigation Buttons */
+        .nav-buttons { display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-save { background: #4caf50; color: white; }
+        .btn-save:hover { background: #45a049; }
+        .btn-clear { background: #ff9800; color: white; }
+        .btn-clear:hover { background: #f57c00; }
+        .btn-review { background: #9c27b0; color: white; }
+        .btn-review:hover { background: #7b1fa2; }
+        .btn-submit { background: #f44336; color: white; }
+        .btn-submit:hover { background: #d32f2f; }
+
+        /* Question Palette */
+        .palette-section { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-height: calc(100vh - 140px); overflow-y: auto; position: sticky; top: 100px; }
+        .palette-header { font-size: 16px; font-weight: bold; color: #2a5298; margin-bottom: 15px; text-align: center; }
+        .palette-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; font-size: 11px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-box { width: 25px; height: 25px; border-radius: 4px; border: 2px solid #ddd; }
+        .not-visited { background: white; }
+        .answered { background: #4caf50; }
+        .not-answered { background: #f44336; }
+        .marked { background: #9c27b0; }
+
+        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .palette-btn { width: 50px; height: 50px; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-weight: bold; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .palette-btn:hover { transform: scale(1.1); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+        .palette-btn.current { border-color: #2196F3; border-width: 3px; }
+        .palette-btn.answered { background: #4caf50; color: white; }
+        .palette-btn.not-answered { background: #f44336; color: white; }
+        .palette-btn.marked { background: #9c27b0; color: white; }
+
+        .summary-section { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        .summary-section h4 { margin-bottom: 10px; color: #2a5298; }
+        .summary-item { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
+
+        @media (max-width: 1024px) { .exam-container { grid-template-columns: 1fr; } .palette-section { position: relative; top: 0; max-height: none; } }
+    </style>
+</head>
+<body>
+    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+
+    <div class="exam-header">
+        <div class="candidate-info">
+            <h2 id="candidateName">Loading...</h2>
+            <p>Paper-II: Political Science | Roll: <span id="rollNumber">-</span> | App: <span id="appNumber">-</span></p>
+        </div>
+        <div class="progress-stats">
+            <div class="progress-percentage" id="progressPercent">0%</div>
+            <div class="progress-label">Completed</div>
+        </div>
+        <div class="language-toggle">
+            <span style="color: white; font-size: 12px;">Lang:</span>
+            <button class="lang-btn" id="btnEnglish" onclick="setLanguage('english')">Eng</button>
+            <button class="lang-btn active" id="btnBoth" onclick="setLanguage('both')">Both</button>
+            <button class="lang-btn" id="btnHindi" onclick="setLanguage('hindi')">हिंदी</button>
+        </div>
+        <div class="timer-section">
+            <div class="timer" id="timer">02:30:00</div>
+            <div class="timer-label">Time Left</div>
+        </div>
+    </div>
+
+    <div class="exam-container">
+        <div class="question-area">
+            <div class="question-header">
+                <div class="question-number" id="questionNumber">Question 1 of 150</div>
+                <div class="subject-tag" id="subjectTag">Constitution</div>
+            </div>
+            <div class="question-text" id="questionText">Loading question...</div>
+            <div class="options" id="optionsContainer"></div>
+            <div class="nav-buttons">
+                <button class="btn btn-save" onclick="saveAndNext()">Save & Next</button>
+                <button class="btn btn-clear" onclick="clearResponse()">Clear Response</button>
+                <button class="btn btn-review" onclick="markForReview()">Mark for Review</button>
+                <button class="btn btn-submit" onclick="submitExam()">Submit Test</button>
+            </div>
+        </div>
+
+        <div class="palette-section">
+            <div class="palette-header">Question Palette</div>
+            <div class="palette-legend">
+                <div class="legend-item"><div class="legend-box not-visited"></div><span>Not Visited</span></div>
+                <div class="legend-item"><div class="legend-box answered"></div><span>Answered</span></div>
+                <div class="legend-item"><div class="legend-box not-answered"></div><span>Not Answered</span></div>
+                <div class="legend-item"><div class="legend-box marked"></div><span>Marked</span></div>
+            </div>
+            <div class="palette-grid" id="paletteGrid"></div>
+            <div class="summary-section">
+                <h4>Summary</h4>
+                <div class="summary-item"><span>Answered:</span><span id="answeredCount">0</span></div>
+                <div class="summary-item"><span>Not Answered:</span><span id="notAnsweredCount">0</span></div>
+                <div class="summary-item"><span>Marked:</span><span id="markedCount">0</span></div>
+                <div class="summary-item"><span>Not Visited:</span><span id="notVisitedCount">150</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="shuffle_utility.js"></script>
+    <script src="paper2_questions.js"></script>
+    <script src="paper2_new_set_questions.js"></script>
+    <script src="paper2_set3_NEW_FRESH.js"></script>
+    <script src="paper2set4.js"></script>
+    <script src="paper2set5.js"></script>
+    <script src="paper2set6.js"></script>
+    <script src="paper2set7.js"></script>
+    <script>
+        // Enhanced session validation
+        function validateSession() {
+            if (sessionStorage.getItem('loggedIn') !== 'true') {
+                alert('Please login first!');
+                window.location.href = 'stet_login.html';
+                return false;
+            }
+            
+            const loginTime = sessionStorage.getItem('loginTime');
+            if (loginTime) {
+                const sessionAge = Date.now() - new Date(loginTime).getTime();
+                const maxSessionAge = 8 * 60 * 60 * 1000; // 8 hours
+                
+                if (sessionAge > maxSessionAge) {
+                    alert('Session expired. Please login again.');
+                    sessionStorage.clear();
+                    window.location.href = 'stet_login.html';
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        if (!validateSession()) { /* Exit if session invalid */ }
+
+        // Load candidate info with fallback
+        document.getElementById('candidateName').textContent = sessionStorage.getItem('candidateName') || 'PRITI PRIYADARSHINI';
+        document.getElementById('rollNumber').textContent = sessionStorage.getItem('rollNumber') || '250320075996';
+        document.getElementById('appNumber').textContent = sessionStorage.getItem('applicationNumber') || 'BS25075996';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedSet = urlParams.get('set') || sessionStorage.getItem('selectedSet') || 'set1';
+        
+        let questionBank = paper2Questions; // Default fallback
+        
+        // Wait for scripts to load then set question bank
+        setTimeout(() => {
+            try {
+                switch(selectedSet) {
+                    case 'newset':
+                        questionBank = window.paper2NewSetQuestions || (typeof paper2NewSetQuestions !== 'undefined' ? paper2NewSetQuestions : null);
+                        break;
+                    case 'set3':
+                        questionBank = window.paper2Set3NewQuestions || (typeof paper2Set3NewQuestions !== 'undefined' ? paper2Set3NewQuestions : null);
+                        break;
+                    case 'set4':
+                        questionBank = window.paper2Set4CompleteQuestions || (typeof paper2Set4CompleteQuestions !== 'undefined' ? paper2Set4CompleteQuestions : null);
+                        break;
+                    case 'set5':
+                        questionBank = window.paper2Set5EnhancedQuestions || (typeof paper2Set5EnhancedQuestions !== 'undefined' ? paper2Set5EnhancedQuestions : null);
+                        break;
+                    case 'set6':
+                        questionBank = window.paper2Set6CompleteQuestions || (typeof paper2Set6CompleteQuestions !== 'undefined' ? paper2Set6CompleteQuestions : null);
+                        break;
+                    case 'set7':
+                        questionBank = window.paper2Set7CompleteQuestions || (typeof paper2Set7CompleteQuestions !== 'undefined' ? paper2Set7CompleteQuestions : null);
+                        break;
+                    default:
+                        questionBank = paper2Questions;
+                }
+                
+                // Ensure we have a valid question bank
+                if (!questionBank || !Array.isArray(questionBank) || questionBank.length === 0) {
+                    console.error('No valid question bank found for set:', selectedSet);
+                    console.log('Available variables:', {
+                        paper2Questions: typeof paper2Questions !== 'undefined' ? paper2Questions.length : 'undefined',
+                        paper2NewSetQuestions: typeof paper2NewSetQuestions !== 'undefined' ? paper2NewSetQuestions.length : 'undefined',
+                        paper2Set3NewQuestions: typeof paper2Set3NewQuestions !== 'undefined' ? paper2Set3NewQuestions.length : 'undefined',
+                        paper2Set4CompleteQuestions: typeof paper2Set4CompleteQuestions !== 'undefined' ? paper2Set4CompleteQuestions.length : 'undefined',
+                        paper2Set5EnhancedQuestions: typeof paper2Set5EnhancedQuestions !== 'undefined' ? paper2Set5EnhancedQuestions.length : 'undefined'
+                    });
+                    questionBank = paper2Questions; // Fallback to default
+                }
+                
+                console.log('Selected Set:', selectedSet, 'Questions Available:', questionBank.length);
+                
+                // Shuffle questions and options
+                if (questionBank && questionBank.length > 0) {
+                    const sessionId = sessionStorage.getItem('sessionId') || Date.now();
+                    sessionStorage.setItem('sessionId', sessionId);
+                    
+                    const savedBank = localStorage.getItem(`paper2QuestionBank_${sessionId}`);
+                    if (savedBank) {
+                        questionBank = JSON.parse(savedBank);
+                    } else {
+                        questionBank = window.shuffleUtility.shuffleQuestionsAndOptions(questionBank);
+                        localStorage.setItem(`paper2QuestionBank_${sessionId}`, JSON.stringify(questionBank));
+                    }
+                    
+                    console.log('Questions Shuffled:', questionBank.length);
+                    loadSavedData();
+                    initializePalette();
+                    loadQuestion(currentQuestionIndex);
+                } else {
+                    document.getElementById('questionText').innerHTML = 'Error: Questions not loaded. Please refresh the page.';
+                }
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                document.getElementById('questionText').innerHTML = 'Error loading questions. Please refresh the page.';
+            }
+        }, 500);
+        
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        let visitedQuestions = [];
+        let markedForReviewList = [];
+        let timeRemaining = 150 * 60;
+        let languageMode = 'both';
+        let sessionId = sessionStorage.getItem('sessionId') || Date.now();
+        sessionStorage.setItem('sessionId', sessionId);
+        const AUTOSAVE_KEY = `stet_paper2_${selectedSet}_${sessionId}`;
+
+        function loadSavedData() {
+            const saved = sessionStorage.getItem(AUTOSAVE_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                userAnswers = data.userAnswers || {};
+                visitedQuestions = data.visitedQuestions || [];
+                markedForReviewList = data.markedForReviewList || [];
+                currentQuestionIndex = data.currentQuestionIndex || 0;
+                timeRemaining = data.timeRemaining || 150 * 60;
+                languageMode = data.languageMode || 'both';
+            }
+        }
+
+        function autoSave() {
+            try {
+                const data = { 
+                    userAnswers, 
+                    visitedQuestions, 
+                    markedForReviewList, 
+                    currentQuestionIndex, 
+                    timeRemaining, 
+                    languageMode,
+                    lastSaved: Date.now(),
+                    examProgress: Math.round((Object.keys(userAnswers).length / questionBank.length) * 100)
+                };
+                sessionStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
+                
+                // Visual feedback for autosave
+                const progressStats = document.querySelector('.progress-stats');
+                if (progressStats) {
+                    progressStats.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                    setTimeout(() => {
+                        progressStats.style.backgroundColor = '';
+                    }, 500);
+                }
+            } catch (error) {
+                console.error('Autosave failed:', error);
+            }
+
+        }
+        
+        function clearSavedData() { 
+            sessionStorage.removeItem(AUTOSAVE_KEY); 
+        }
+
+        function setLanguage(lang) {
+            languageMode = lang;
+            document.getElementById('btnEnglish').classList.remove('active');
+            document.getElementById('btnHindi').classList.remove('active');
+            document.getElementById('btnBoth').classList.remove('active');
+            if (lang === 'english') document.getElementById('btnEnglish').classList.add('active');
+            else if (lang === 'hindi') document.getElementById('btnHindi').classList.add('active');
+            else document.getElementById('btnBoth').classList.add('active');
+            loadQuestion(currentQuestionIndex);
+        }
+
+        function initializePalette() {
+            const paletteGrid = document.getElementById('paletteGrid');
+            paletteGrid.innerHTML = '';
+            for (let i = 0; i < questionBank.length; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'palette-btn';
+                btn.textContent = i + 1;
+                btn.onclick = () => goToQuestion(i);
+                paletteGrid.appendChild(btn);
+            }
+        }
+
+        function loadQuestion(index) {
+            if (index < 0 || index >= questionBank.length) return;
+            currentQuestionIndex = index;
+            const question = questionBank[index];
+            if (!visitedQuestions.includes(index)) visitedQuestions.push(index);
+
+            document.getElementById('questionNumber').textContent = `Question ${index + 1} of ${questionBank.length}`;
+            document.getElementById('subjectTag').textContent = question.subject;
+            
+            const questionContainer = document.getElementById('questionText');
+            if (languageMode === 'english') {
+                questionContainer.innerHTML = `<div class="question-english">${question.question}</div>`;
+            } else if (languageMode === 'hindi') {
+                questionContainer.innerHTML = `<div class="question-hindi">${question.questionHindi || question.question}</div>`;
+            } else {
+                questionContainer.innerHTML = `<div class="question-english">${question.question}</div><div class="question-hindi">${question.questionHindi || ''}</div>`;
+            }
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            question.options.forEach((option, optIndex) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                if (userAnswers[question.id] === optIndex) optionDiv.classList.add('selected');
+
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'answer';
+                radio.id = `option${optIndex}`;
+                radio.value = optIndex;
+                radio.checked = userAnswers[question.id] === optIndex;
+                radio.onchange = () => selectOption(optIndex);
+
+                const label = document.createElement('label');
+                label.htmlFor = `option${optIndex}`;
+                label.textContent = option;
+
+                optionDiv.appendChild(radio);
+                optionDiv.appendChild(label);
+                optionDiv.onclick = () => { radio.checked = true; selectOption(optIndex); };
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            updatePalette();
+            updateSummary();
+            updateProgressBar();
+        }
+
+        function selectOption(optIndex) {
+            const question = questionBank[currentQuestionIndex];
+            userAnswers[question.id] = optIndex;
+            document.querySelectorAll('.option').forEach((opt, idx) => {
+                if (idx === optIndex) opt.classList.add('selected');
+                else opt.classList.remove('selected');
+            });
+            updatePalette();
+            updateSummary();
+            updateProgressBar();
+            autoSave();
+        }
+
+        function updatePalette() {
+            const paletteBtns = document.querySelectorAll('.palette-btn');
+            paletteBtns.forEach((btn, index) => {
+                btn.classList.remove('answered', 'not-answered', 'marked', 'current');
+                const qId = questionBank[index].id;
+                if (index === currentQuestionIndex) btn.classList.add('current');
+                if (markedForReviewList.includes(index)) btn.classList.add('marked');
+                else if (userAnswers[qId] !== undefined) btn.classList.add('answered');
+                else if (visitedQuestions.includes(index)) btn.classList.add('not-answered');
+            });
+        }
+
+        function updateSummary() {
+            let answered = 0, notAnswered = 0;
+            questionBank.forEach((q, idx) => {
+                if (userAnswers[q.id] !== undefined) answered++;
+                else if (visitedQuestions.includes(idx)) notAnswered++;
+            });
+            document.getElementById('answeredCount').textContent = answered;
+            document.getElementById('notAnsweredCount').textContent = notAnswered;
+            document.getElementById('markedCount').textContent = markedForReviewList.length;
+            document.getElementById('notVisitedCount').textContent = questionBank.length - visitedQuestions.length;
+        }
+
+        function updateProgressBar() {
+            const progressPercent = Math.round((Object.keys(userAnswers).length / questionBank.length) * 100);
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+            document.getElementById('progressPercent').textContent = progressPercent + '%';
+        }
+
+        function saveAndNext() {
+            if (currentQuestionIndex < questionBank.length - 1) loadQuestion(currentQuestionIndex + 1);
+            else alert('This is the last question. Click Submit to finish.');
+        }
+
+        function clearResponse() {
+            delete userAnswers[questionBank[currentQuestionIndex].id];
+            loadQuestion(currentQuestionIndex);
+            autoSave();
+        }
+
+        function markForReview() {
+            if (!markedForReviewList.includes(currentQuestionIndex)) markedForReviewList.push(currentQuestionIndex);
+            autoSave();
+            saveAndNext();
+        }
+
+        function goToQuestion(index) { loadQuestion(index); }
+
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+            timerElement.textContent = String(Math.floor(timeRemaining / 3600)).padStart(2, '0') + ':' + String(Math.floor((timeRemaining % 3600) / 60)).padStart(2, '0') + ':' + String(timeRemaining % 60).padStart(2, '0');
+            const interval = setInterval(() => {
+                timeRemaining--;
+                const hours = Math.floor(timeRemaining / 3600);
+                const minutes = Math.floor((timeRemaining % 3600) / 60);
+                const seconds = timeRemaining % 60;
+                timerElement.textContent = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+                if (timeRemaining < 300) timerElement.style.color = '#ff5252';
+                if (timeRemaining <= 0) { clearInterval(interval); alert('Time up!'); submitExam(); }
+                if (timeRemaining % 30 === 0) autoSave();
+            }, 1000);
+        }
+
+        function submitExam() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const notAnsweredCount = questionBank.length - answeredCount;
+            const markedCount = markedForReviewList.length;
+            
+            const confirmMsg = `Submit Paper-II?\n\n✅ Answered: ${answeredCount}\n❌ Not Answered: ${notAnsweredCount}\n📝 Marked for Review: ${markedCount}\n\nTime Remaining: ${Math.floor(timeRemaining/60)}:${String(timeRemaining%60).padStart(2,'0')}\n\nAre you sure you want to submit?`;
+            
+            if (!confirm(confirmMsg)) return;
+            
+            // Show submission progress
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                justify-content: center; z-index: 9999; color: white;
+            `;
+            overlay.innerHTML = '<div style="text-align: center;"><h3>📊 Processing Results...</h3><p>Please wait...</p></div>';
+            document.body.appendChild(overlay);
+            
+            setTimeout(() => {
+                try {
+                    let correctAnswers = 0, wrongAnswers = 0, notAnswered = 0;
+                    const detailedResults = [];
+                    
+                    questionBank.forEach((q, index) => {
+                        const userAnswer = userAnswers[q.id];
+                        const isCorrect = userAnswer === q.correct;
+                        const isAnswered = userAnswer !== undefined;
+                        
+                        if (isAnswered) {
+                            if (isCorrect) correctAnswers++;
+                            else wrongAnswers++;
+                        } else {
+                            notAnswered++;
+                        }
+                        
+                        detailedResults.push({
+                            questionId: q.id,
+                            questionIndex: index,
+                            userAnswer: userAnswer,
+                            correctAnswer: q.correct,
+                            isCorrect: isCorrect,
+                            isAnswered: isAnswered,
+                            subject: q.subject,
+                            timeTaken: 0 // Could be enhanced to track time per question
+                        });
+                    });
+                    
+                    const percentage = Math.round((correctAnswers / questionBank.length) * 100);
+                    const grade = percentage >= 60 ? 'A' : percentage >= 50 ? 'B' : percentage >= 40 ? 'C' : 'F';
+                    
+                    // Store comprehensive results
+                    sessionStorage.setItem('paper2Score', correctAnswers);
+                    sessionStorage.setItem('paper2Correct', correctAnswers);
+                    sessionStorage.setItem('paper2Wrong', wrongAnswers);
+                    sessionStorage.setItem('paper2NotAnswered', notAnswered);
+                    sessionStorage.setItem('paper2UserAnswers', JSON.stringify(userAnswers));
+                    sessionStorage.setItem('paper2DetailedResults', JSON.stringify(detailedResults));
+                    sessionStorage.setItem('paper2Percentage', percentage);
+                    sessionStorage.setItem('paper2Grade', grade);
+                    sessionStorage.setItem('selectedSet', selectedSet);
+                    sessionStorage.setItem('examCompletedAt', new Date().toISOString());
+                    
+                    // Enhanced history entry
+                    const history = JSON.parse(localStorage.getItem('testHistory') || '[]');
+                    const historyEntry = {
+                        paper: 'Paper-II',
+                        set: selectedSet,
+                        correct: correctAnswers,
+                        wrong: wrongAnswers,
+                        notAnswered: notAnswered,
+                        percentage: percentage,
+                        grade: grade,
+                        timestamp: Date.now(),
+                        sessionId: sessionId,
+                        userAnswers: userAnswers,
+                        questionBank: questionBank,
+                        detailedResults: detailedResults,
+                        examDuration: 150 * 60 - timeRemaining,
+                        candidateName: sessionStorage.getItem('candidateName'),
+                        rollNumber: sessionStorage.getItem('rollNumber')
+                    };
+                    
+                    history.push(historyEntry);
+                    localStorage.setItem('testHistory', JSON.stringify(history));
+                    
+                    clearSavedData();
+                    
+                    overlay.innerHTML = '<div style="text-align: center;"><h3>✅ Exam Submitted Successfully!</h3><p>Redirecting to results...</p></div>';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'paper2_result.html';
+                    }, 1500);
+                    
+                } catch (error) {
+                    console.error('Submission error:', error);
+                    overlay.innerHTML = '<div style="text-align: center;"><h3>❌ Submission Error</h3><p>Please try again.</p></div>';
+                    setTimeout(() => {
+                        document.body.removeChild(overlay);
+                    }, 2000);
+                }
+            }, 1000);
+        }
+
+        // Enhanced security and navigation controls
+        function preventNavigation() {
+            window.history.pushState(null, "", window.location.href);
+            window.onpopstate = function() { 
+                if (confirm('Are you sure you want to leave the exam? All progress will be lost!')) {
+                    sessionStorage.clear();
+                    window.location.href = 'paper_selection.html';
+                } else {
+                    window.history.pushState(null, "", window.location.href);
+                }
+            };
+        }
+        
+        // Enhanced security measures
+        function enhanceSecurity() {
+            // Disable right-click
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Disable F12, Ctrl+Shift+I, Ctrl+U
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                    (e.ctrlKey && e.key === 'u')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Disable text selection
+            document.onselectstart = function() { return false; };
+            document.onmousedown = function() { return false; };
+            
+            // Blur detection
+            let isBlurred = false;
+            window.addEventListener('blur', function() {
+                if (!isBlurred) {
+                    isBlurred = true;
+                    console.warn('Window lost focus - potential cheating attempt');
+                }
+            });
+            
+            window.addEventListener('focus', function() {
+                if (isBlurred) {
+                    isBlurred = false;
+                }
+            });
+        }
+        
+        preventNavigation();
+        enhanceSecurity();
+
+        
+        // Enhanced security and navigation controls
+        function preventNavigation() {
+            window.history.pushState(null, "", window.location.href);
+            window.onpopstate = function() { 
+                if (confirm('Are you sure you want to leave the exam? All progress will be lost!')) {
+                    sessionStorage.clear();
+                    window.location.href = 'paper_selection.html';
+                } else {
+                    window.history.pushState(null, "", window.location.href);
+                }
+            };
+        }
+        
+        // Enhanced security measures
+        function enhanceSecurity() {
+            // Disable right-click
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Disable F12, Ctrl+Shift+I, Ctrl+U
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                    (e.ctrlKey && e.key === 'u')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Disable text selection
+            document.onselectstart = function() { return false; };
+            document.onmousedown = function() { return false; };
+            
+            // Blur detection
+            let isBlurred = false;
+            window.addEventListener('blur', function() {
+                if (!isBlurred) {
+                    isBlurred = true;
+                    console.warn('Window lost focus - potential cheating attempt');
+                }
+            });
+            
+            window.addEventListener('focus', function() {
+                if (isBlurred) {
+                    isBlurred = false;
+                }
+            });
+        }
+        
+        preventNavigation();
+        enhanceSecurity();
+        startTimer();
+
+
+    </script>
+</body>
+</html>

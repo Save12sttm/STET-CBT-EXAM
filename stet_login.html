@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIHAR STET 2025 - CBT Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .login-body {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 5px;
+        }
+
+        .instructions h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .demo-credentials {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .demo-credentials h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .demo-credentials p {
+            color: #856404;
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Bihar School Examination Board</h1>
+            <p>STET 2025 - Computer Based Test</p>
+        </div>
+
+        <div class="login-body">
+            <div class="error-message" id="errorMessage"></div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginId">Application Number / Login ID:</label>
+                    <input 
+                        type="text" 
+                        id="loginId" 
+                        name="loginId" 
+                        placeholder="Enter your application number"
+                        required
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <div style="position: relative;">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Enter your password"
+                            required
+                            style="padding-right: 45px;"
+                        >
+                        <button 
+                            type="button" 
+                            id="togglePassword" 
+                            onclick="togglePasswordVisibility()"
+                            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; color: #667eea;"
+                            title="Show/Hide Password"
+                        >
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login">Login to CBT System</button>
+            </form>
+
+            <div class="demo-credentials">
+                <h4>🔐 Login Information:</h4>
+                <p>Any Login ID and Password will work!</p>
+                <p>Example: test123 / password123</p>
+            </div>
+
+            <div class="instructions">
+                <h3>📋 Important Instructions:</h3>
+                <ul>
+                    <li>Enter your Application Number as Login ID</li>
+                    <li>Password is case-sensitive</li>
+                    <li>Ensure stable internet connection</li>
+                    <li>Do not press Back/Refresh during the exam</li>
+                    <li>Use Chrome/Firefox for best experience</li>
+                    <li>The exam will auto-submit when time expires</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showError(message, duration = 3000) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = message;
+            
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, duration);
+        }
+        
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const loginId = document.getElementById('loginId').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!loginId || !password) {
+                showError('❌ Please enter both Login ID and Password');
+                return;
+            }
+            
+            sessionStorage.clear();
+            sessionStorage.setItem('candidateName', 'STET CANDIDATE');
+            sessionStorage.setItem('rollNumber', '250320000001');
+            sessionStorage.setItem('applicationNumber', loginId);
+            sessionStorage.setItem('loggedIn', 'true');
+            sessionStorage.setItem('sessionId', Date.now());
+            sessionStorage.setItem('loginTime', new Date().toISOString());
+            
+            showError('✅ Login successful! Redirecting...', 1000);
+            
+            setTimeout(() => {
+                window.location.href = 'paper_selection.html';
+            }, 1000);
+        }
+        
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById('password');
+            const toggleButton = document.getElementById('togglePassword');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleButton.textContent = '🙈';
+                toggleButton.title = 'Hide Password';
+            } else {
+                passwordField.type = 'password';
+                toggleButton.textContent = '👁️';
+                toggleButton.title = 'Show Password';
+            }
+        }
+
+        if (sessionStorage.getItem('loggedIn') === 'true') {
+            if (confirm('You are already logged in. Continue to exam?')) {
+                window.location.href = 'paper_selection.html';
+            } else {
+                sessionStorage.clear();
+            }
+        }
+    </script>
+</body>
+</html>

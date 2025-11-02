@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STET 2025 - Select Paper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px 15px 0 0;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            color: #1e3c72;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .candidate-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+            margin: 20px 0;
+        }
+
+        .candidate-info h3 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            color: #555;
+        }
+
+        .papers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .paper-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .paper-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: #667eea;
+        }
+
+        .paper-card.morning {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .paper-card.afternoon {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .paper-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .paper-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .paper-code {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .paper-details {
+            text-align: left;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 10px;
+        }
+
+        .detail-item {
+            padding: 5px 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .detail-item strong {
+            color: #1e3c72;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .papers-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>बिहार विद्यालय परीक्षा बोर्ड</h1>
+            <h1>Bihar School Examination Board</h1>
+            <p>State Teacher Eligibility Test (STET) - 2025</p>
+            <button onclick="window.location.href='test_history.html'" style="margin-top: 15px; padding: 10px 25px; background: #667eea; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold;">📊 View Test History</button>
+        </div>
+
+        <div class="papers-container">
+            <div class="candidate-info" style="grid-column: 1 / -1;">
+                <h3>👤 Candidate Information</h3>
+                <div class="info-row">
+                    <span><strong>Name:</strong> <span id="candidateName">-</span></span>
+                    <span><strong>Roll No:</strong> <span id="rollNumber">-</span></span>
+                    <span><strong>Application No:</strong> <span id="appNumber">-</span></span>
+                </div>
+            </div>
+
+
+
+            <!-- Paper-I Card -->
+            <div class="paper-card morning" onclick="startPaper(1)">
+                <div class="paper-icon">📚</div>
+                <div class="paper-title">PAPER-I</div>
+                <div class="paper-code">Subject Code: 112 - Social Science<br>[सामाजिक विज्ञान]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Secondary (Class 9-10)</div>
+                    <div class="detail-item"><strong>Timing:</strong> 🕒 9:00 AM - 11:30 AM</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Social Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        History, Geography, Civics, Economics, Pedagogy
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Paper-I</button>
+            </div>
+
+            <!-- Paper-II Card -->
+            <div class="paper-card afternoon" onclick="startPaper(2)">
+                <div class="paper-icon">🏛️</div>
+                <div class="paper-title">PAPER-II</div>
+                <div class="paper-code">Subject Code: 219 - Political Science<br>[राजनीति विज्ञान]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Higher Secondary (Class 11-12)</div>
+                    <div class="detail-item"><strong>Timing:</strong> 🕑 2:30 PM - 5:00 PM</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Political Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Constitution, Political Theory, Int. Relations, Thinkers
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Paper-II</button>
+            </div>
+
+
+
+            <!-- Paper-I Set 2 Card -->
+            <div class="paper-card morning" onclick="selectPaper('paper1', 'newset')">
+                <div class="paper-icon">📚✨</div>
+                <div class="paper-title">PAPER-I SET 2</div>
+                <div class="paper-code">Subject Code: 112 - Social Science<br>[सामाजिक विज्ञान - सेट 2]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Secondary (Class 9-10)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Set 2)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Social Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Fresh Questions - History, Geography, Civics, Economics
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 2</button>
+            </div>
+            <!-- Paper-II Set 2 Card -->
+            <div class="paper-card afternoon" onclick="selectPaper('paper2', 'newset')">
+                <div class="paper-icon">🏛️✨</div>
+                <div class="paper-title">PAPER-II SET 2</div>
+                <div class="paper-code">Subject Code: 219 - Political Science<br>[राजनीति विज्ञान - सेट 2]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Higher Secondary (Class 11-12)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Set 2)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Political Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Fresh Questions - Constitution, Theory, Relations
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 2</button>
+            </div>
+
+
+
+            <!-- Paper-I Set 3 Card -->
+            <div class="paper-card morning" onclick="selectPaper('paper1', 'set3')">
+                <div class="paper-icon">📚🔥</div>
+                <div class="paper-title">PAPER-I SET 3</div>
+                <div class="paper-code">Subject Code: 112 - Social Science<br>[सामाजिक विज्ञान - सेट 3]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Secondary (Class 9-10)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Fresh Set)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Social Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Fresh Questions - History, Geography, Civics, Economics
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 3</button>
+            </div>
+            <!-- Paper-II Set 3 Card -->
+            <div class="paper-card afternoon" onclick="selectPaper('paper2', 'set3')">
+                <div class="paper-icon">🏛️🔥</div>
+                <div class="paper-title">PAPER-II SET 3</div>
+                <div class="paper-code">Subject Code: 219 - Political Science<br>[राजनीति विज्ञान - सेट 3]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Higher Secondary (Class 11-12)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Fresh Set)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Political Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Fresh Questions - Constitution, Theory, Relations
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 3</button>
+            </div>
+
+
+
+            <!-- Paper-I Set 4 Card -->
+            <div class="paper-card morning" onclick="selectPaper('paper1', 'set4')">
+                <div class="paper-icon">📚⭐</div>
+                <div class="paper-title">PAPER-I SET 4</div>
+                <div class="paper-code">Subject Code: 112 - Social Science<br>[सामाजिक विज्ञान - सेट 4]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Secondary (Class 9-10)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Latest Set)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Social Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Latest Questions - History, Geography, Civics, Economics
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 4</button>
+            </div>
+            <!-- Paper-II Set 4 Card -->
+            <div class="paper-card afternoon" onclick="selectPaper('paper2', 'set4')">
+                <div class="paper-icon">🏛️⭐</div>
+                <div class="paper-title">PAPER-II SET 4</div>
+                <div class="paper-code">Subject Code: 219 - Political Science<br>[राजनीति विज्ञान - सेट 4]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Higher Secondary (Class 11-12)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Latest Set)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Political Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Latest Questions - Constitution, Theory, Relations
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 4</button>
+            </div>
+
+
+
+            <!-- Paper-I Set 5 Card -->
+            <div class="paper-card morning" onclick="selectPaper('paper1', 'set5')">
+                <div class="paper-icon">📚💎</div>
+                <div class="paper-title">PAPER-I SET 5</div>
+                <div class="paper-code">Subject Code: 112 - Social Science<br>[सामाजिक विज्ञान - सेट 5]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Secondary (Class 9-10)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Enhanced Set)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Social Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Enhanced Questions - History, Geography, Civics, Economics
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 5</button>
+            </div>
+            <!-- Paper-II Set 5 Card -->
+            <div class="paper-card afternoon" onclick="selectPaper('paper2', 'set5')">
+                <div class="paper-icon">🏛️💎</div>
+                <div class="paper-title">PAPER-II SET 5</div>
+                <div class="paper-code">Subject Code: 219 - Political Science<br>[राजनीति विज्ञान - सेट 5]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Higher Secondary (Class 11-12)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Enhanced Set)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Political Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Enhanced Questions - Constitution, Theory, Relations, Pedagogy
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 5</button>
+            </div>
+
+
+
+            <!-- Paper-I Set 6 Card -->
+            <div class="paper-card morning" onclick="selectPaper('paper1', 'set6')">
+                <div class="paper-icon">📚🌟</div>
+                <div class="paper-title">PAPER-I SET 6</div>
+                <div class="paper-code">Subject Code: 112 - Social Science<br>[सामाजिक विज्ञान - सेट 6]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Secondary (Class 9-10)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Premium Set)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Social Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Premium Questions - History, Geography, Civics, Economics
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 6</button>
+            </div>
+            <!-- Paper-II Set 6 Card -->
+            <div class="paper-card afternoon" onclick="selectPaper('paper2', 'set6')">
+                <div class="paper-icon">🏛️🌟</div>
+                <div class="paper-title">PAPER-II SET 6</div>
+                <div class="paper-code">Subject Code: 219 - Political Science<br>[राजनीति विज्ञान - सेट 6]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Higher Secondary (Class 11-12)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Premium Set)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Political Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Premium Questions - Constitution, Theory, Relations, Pedagogy
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 6</button>
+            </div>
+
+            <!-- Paper-II Set 7 Card -->
+            <div class="paper-card afternoon" onclick="selectPaper('paper2', 'set7')">
+                <div class="paper-icon">🏛️💫</div>
+                <div class="paper-title">PAPER-II SET 7</div>
+                <div class="paper-code">Subject Code: 219 - Political Science<br>[राजनीति विज्ञान - सेट 7]</div>
+                
+                <div class="paper-details">
+                    <div class="detail-item"><strong>Level:</strong> Higher Secondary (Class 11-12)</div>
+                    <div class="detail-item"><strong>Duration:</strong> 2 hours 30 minutes</div>
+                    <div class="detail-item"><strong>Questions:</strong> 150 (Advanced Set)</div>
+                    <div class="detail-item"><strong>Marks:</strong> 150</div>
+                    <div class="detail-item"><strong>Subject:</strong> Political Science</div>
+                    <div class="detail-item" style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Advanced Questions - Constitution, Theory, Relations, Pedagogy
+                    </div>
+                </div>
+
+                <button class="start-btn">Start Set 7</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if logged in
+        if (sessionStorage.getItem('loggedIn') !== 'true') {
+            alert('Please login first!');
+            window.location.href = 'stet_login.html';
+        }
+
+        // Load candidate info
+        document.getElementById('candidateName').textContent = sessionStorage.getItem('candidateName') || 'Unknown';
+        document.getElementById('rollNumber').textContent = sessionStorage.getItem('rollNumber') || 'N/A';
+        document.getElementById('appNumber').textContent = sessionStorage.getItem('applicationNumber') || 'N/A';
+
+        function startPaper(paperNumber) {
+            // Store selected paper
+            sessionStorage.setItem('selectedPaper', paperNumber);
+            sessionStorage.setItem('selectedSet', 'set1');
+            
+            // Redirect to respective exam page
+            if (paperNumber === 1) {
+                window.location.href = 'stet_paper1_exam.html';
+            } else {
+                window.location.href = 'stet_paper2_exam.html';
+            }
+        }
+
+        function selectPaper(paper, set) {
+            // Store selected paper and set
+            sessionStorage.setItem('selectedPaper', paper === 'paper1' ? 1 : 2);
+            sessionStorage.setItem('selectedSet', set);
+            
+            // Redirect to respective exam page
+            if (paper === 'paper1') {
+                window.location.href = 'stet_paper1_exam.html?set=' + set;
+            } else {
+                window.location.href = 'stet_paper2_exam.html?set=' + set;
+            }
+        }
+    </script>
+</body>
+</html>
