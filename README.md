@@ -257,10 +257,10 @@ guages](https://img.shields.io/badge/Languages-2-red?style=for-the-badge&logo=la
 
 **We welcome contributions! 🎉**
 
-[![Contributors](https://img.shields.io/github/contributors/akash/bihar-stet-2025?style=for-the-badge&color=brightgreen)](https://github.com/akash/bihar-stet-2025/graphs/contributors)
-[![Forks](https://img.shields.io/github/forks/akash/bihar-stet-2025?style=for-the-badge&color=blue)](https://github.com/akash/bihar-stet-2025/network/members)
-[![Stars](https://img.shields.io/github/stars/akash/bihar-stet-2025?style=for-the-badge&color=yellow)](https://github.com/akash/bihar-stet-2025/stargazers)
-[![Issues](https://img.shields.io/github/issues/akash/bihar-stet-2025?style=for-the-badge&color=red)](https://github.com/akash/bihar-stet-2025/issues)
+[![Contributors](https://img.shields.io/github/contributors/Save12sttm/STET-CBT-EXAM?style=for-the-badge&color=brightgreen)](https://github.com/Save12sttm/STET-CBT-EXAM/graphs/contributors)
+[![Forks](https://img.shields.io/github/forks/Save12sttm/STET-CBT-EXAM?style=for-the-badge&color=blue)](https://github.com/Save12sttm/STET-CBT-EXAM/network/members)
+[![Stars](https://img.shields.io/github/stars/Save12sttm/STET-CBT-EXAM?style=for-the-badge&color=yellow)](https://github.com/Save12sttm/STET-CBT-EXAM/stargazers)
+[![Issues](https://img.shields.io/github/issues/Save12sttm/STET-CBT-EXAM?style=for-the-badge&color=red)](https://github.com/Save12sttm/STET-CBT-EXAM/issues)
 
 </div>
 
@@ -276,10 +276,10 @@ guages](https://img.shields.io/badge/Languages-2-red?style=for-the-badge&logo=la
 
 ```bash
 # Clone the repository
-git clone https://github.com/akash/bihar-stet-2025.git
+git clone https://github.com/Save12sttm/STET-CBT-EXAM.git
 
 # Navigate to project directory
-cd bihar-stet-2025
+cd STET-CBT-EXAM
 
 # Open in browser
 open stet_login.html
