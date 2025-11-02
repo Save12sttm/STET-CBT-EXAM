@@ -264,11 +264,7 @@
         
         if (!validateSession()) { /* Exit if session invalid */ }
 
-        if (sessionStorage.getItem('loggedIn') !== 'true') {
-            alert('Please login first!');
-            window.location.href = 'stet_login.html';
-        }
-t.getElementById('candidateName').textContent = sessionStorage.getItem('candidateName');
+        document.getElementById('candidateName').textContent = sessionStorage.getItem('candidateName');
         document.getElementById('rollNumber').textContent = sessionStorage.getItem('rollNumber');
         document.getElementById('appNumber').textContent = sessionStorage.getItem('applicationNumber');
 
@@ -290,8 +286,6 @@ t.getElementById('candidateName').textContent = sessionStorage.getItem('candidat
         document.getElementById('correctAnswers').textContent = correct;
         document.getElementById('wrongAnswers').textContent = wrong;
         document.getElementById('notAnswered').textContent = notAnswered;
-
-        // Enhanced result display
         document.getElementById('percentage').textContent = percentage + '%';
         
         // Add grade display
@@ -310,9 +304,7 @@ t.getElementById('candidateName').textContent = sessionStorage.getItem('candidat
             document.getElementById('percentage').parentNode.appendChild(timeElement);
         }
 
-        const percentage = ((correct / total) * 100).toFixed(2);
-        document.getElementById('percentage').textContent = percentage + '%';
-st correctPercent = ((correct / total) * 100).toFixed(1);
+        const correctPercent = ((correct / total) * 100).toFixed(1);
         const wrongPercent = ((wrong / total) * 100).toFixed(1);
         const unattemptedPercent = ((notAnswered / total) * 100).toFixed(1);
 
@@ -433,29 +425,10 @@ st correctPercent = ((correct / total) * 100).toFixed(1);
                     }
                 } catch (e) {
                     console.error('Failed to load question bank:', e);
-
-            const sessionId = sessionStorage.getItem('sessionId');
-            const questionsContainer = document.getElementById('questionsContainer');
-            
-            // Try to load saved shuffled question bank from session
-            let questionBank = null;
-            if (sessionId) {
-                const savedBank = sessionStorage.getItem(`paper2QuestionBank_${sessionId}`);
-                if (savedBank) {
-                    questionBank = JSON.parse(savedBank);
                 }
             }
             
-            // Fallback to original banks if saved bank not found
-            if (!questionBank) {
-                const selectedSet = sessionStorage.getItem('selectedSet') || 'set1';
-                switch(selectedSet) {
-                    case 'newset':
-                        questionBank = paper2NewSetQuestions;
-                        break;
-                    default:
-                        questionBank = paper2Questions;
-Bank || questionBank.length === 0) {
+            if (!questionBank || questionBank.length === 0) {
                 questionsContainer.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #666;">
                         <h3>⚠️ Question Data Not Available</h3>
@@ -464,9 +437,7 @@ Bank || questionBank.length === 0) {
                         <button onclick="window.location.href='paper_selection.html'" style="margin-top: 20px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Return to Paper Selection</button>
                     </div>
                 `;
-
-                questionsContainer.innerHTML = '<p>Question data not available. Please retake the exam.</p>';
-eturn;
+                return;
             }
             
             questionsContainer.innerHTML = '';
@@ -591,10 +562,9 @@ eturn;
                     document.head.removeChild(printStyles);
                 }, 1000);
             }, 100);
-
-            document.title = `STET_Paper2_${name}_${roll}`;
-            window.print();
-ction logout() {
+        }
+        
+        function logout() {
             if (confirm('Are you sure you want to logout?')) {
                 sessionStorage.clear();
                 window.location.href = 'stet_login.html';
