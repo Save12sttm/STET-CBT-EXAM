@@ -195,24 +195,26 @@
         // Wait for scripts to load then set question bank
         setTimeout(() => {
             try {
+                console.log('Loading question set:', selectedSet);
+                
                 switch(selectedSet) {
                     case 'newset':
-                        questionBank = window.paper2NewSetQuestions || (typeof paper2NewSetQuestions !== 'undefined' ? paper2NewSetQuestions : null);
+                        questionBank = window.paper2NewSetQuestions || paper2NewSetQuestions;
                         break;
                     case 'set3':
-                        questionBank = window.paper2Set3NewQuestions || (typeof paper2Set3NewQuestions !== 'undefined' ? paper2Set3NewQuestions : null);
+                        questionBank = window.paper2Set3NewQuestions || paper2Set3NewQuestions;
                         break;
                     case 'set4':
-                        questionBank = window.paper2Set4CompleteQuestions || (typeof paper2Set4CompleteQuestions !== 'undefined' ? paper2Set4CompleteQuestions : null);
+                        questionBank = window.paper2Set4CompleteQuestions || paper2Set4CompleteQuestions;
                         break;
                     case 'set5':
-                        questionBank = window.paper2Set5EnhancedQuestions || (typeof paper2Set5EnhancedQuestions !== 'undefined' ? paper2Set5EnhancedQuestions : null);
+                        questionBank = window.paper2Set5EnhancedQuestions || paper2Set5EnhancedQuestions;
                         break;
                     case 'set6':
-                        questionBank = window.paper2Set6CompleteQuestions || (typeof paper2Set6CompleteQuestions !== 'undefined' ? paper2Set6CompleteQuestions : null);
+                        questionBank = window.paper2Set6CompleteQuestions || paper2Set6CompleteQuestions;
                         break;
                     case 'set7':
-                        questionBank = window.paper2Set7CompleteQuestions || (typeof paper2Set7CompleteQuestions !== 'undefined' ? paper2Set7CompleteQuestions : null);
+                        questionBank = window.paper2Set7CompleteQuestions || paper2Set7CompleteQuestions;
                         break;
                     default:
                         questionBank = paper2Questions;
@@ -220,38 +222,56 @@
                 
                 // Ensure we have a valid question bank
                 if (!questionBank || !Array.isArray(questionBank) || questionBank.length === 0) {
-                    console.error('No valid question bank found for set:', selectedSet);
-                    console.log('Available variables:', {
-                        paper2Questions: typeof paper2Questions !== 'undefined' ? paper2Questions.length : 'undefined',
-                        paper2NewSetQuestions: typeof paper2NewSetQuestions !== 'undefined' ? paper2NewSetQuestions.length : 'undefined',
-                        paper2Set3NewQuestions: typeof paper2Set3NewQuestions !== 'undefined' ? paper2Set3NewQuestions.length : 'undefined',
-                        paper2Set4CompleteQuestions: typeof paper2Set4CompleteQuestions !== 'undefined' ? paper2Set4CompleteQuestions.length : 'undefined',
-                        paper2Set5EnhancedQuestions: typeof paper2Set5EnhancedQuestions !== 'undefined' ? paper2Set5EnhancedQuestions.length : 'undefined'
-                    });
+                    console.error('❌ CRITICAL: No valid question bank found for set:', selectedSet);
+                    alert(`❌ Error: Question set '${selectedSet}' not found! Using default set.`);
                     questionBank = paper2Questions; // Fallback to default
                 }
                 
-                console.log('Selected Set:', selectedSet, 'Questions Available:', questionBank.length);
+                console.log('✅ Successfully loaded set:', selectedSet, 'with', questionBank.length, 'questions');
+                
+                // Verify question uniqueness and validate set
+                const firstQuestionText = questionBank[0]?.question || 'N/A';
+                const lastQuestionText = questionBank[questionBank.length - 1]?.question || 'N/A';
+                const questionIds = questionBank.map(q => q.id);
+                const uniqueIds = new Set(questionIds);
+                
+                console.log('🔍 Set Validation:');
+                console.log('- First question:', firstQuestionText.substring(0, 60) + '...');
+                console.log('- Last question:', lastQuestionText.substring(0, 60) + '...');
+                console.log('- Total questions:', questionBank.length);
+                console.log('- Unique IDs:', uniqueIds.size);
+                console.log('- ID validation:', uniqueIds.size === questionBank.length ? '✅ PASS' : '❌ FAIL');
+                
+                // Display set info in header
+                const headerInfo = document.querySelector('.candidate-info p');
+                if (headerInfo) {
+                    headerInfo.innerHTML += ` | <strong style="color: #667eea;">Set: ${selectedSet.toUpperCase()}</strong>`;
+                }
                 
                 // Shuffle questions and options
                 if (questionBank && questionBank.length > 0) {
                     const sessionId = sessionStorage.getItem('sessionId') || Date.now();
                     sessionStorage.setItem('sessionId', sessionId);
                     
-                    const savedBank = localStorage.getItem(`paper2QuestionBank_${sessionId}`);
+                    // Use set-specific storage key to prevent cross-contamination
+                    const storageKey = `paper2QuestionBank_${selectedSet}_${sessionId}`;
+                    const savedBank = localStorage.getItem(storageKey);
+                    
                     if (savedBank) {
                         questionBank = JSON.parse(savedBank);
+                        console.log('📂 Loaded saved shuffled questions for', selectedSet);
                     } else {
                         questionBank = window.shuffleUtility.shuffleQuestionsAndOptions(questionBank);
-                        localStorage.setItem(`paper2QuestionBank_${sessionId}`, JSON.stringify(questionBank));
+                        localStorage.setItem(storageKey, JSON.stringify(questionBank));
+                        console.log('🔀 Shuffled and saved questions for', selectedSet);
                     }
                     
-                    console.log('Questions Shuffled:', questionBank.length);
+                    console.log('📚 Final question bank ready:', questionBank.length, 'questions');
                     loadSavedData();
                     initializePalette();
                     loadQuestion(currentQuestionIndex);
                 } else {
-                    document.getElementById('questionText').innerHTML = 'Error: Questions not loaded. Please refresh the page.';
+                    document.getElementById('questionText').innerHTML = `❌ Error: Questions not loaded for set '${selectedSet}'. Please refresh the page.`;
                 }
             } catch (error) {
                 console.error('Error loading questions:', error);
@@ -268,6 +288,26 @@
         let sessionId = sessionStorage.getItem('sessionId') || Date.now();
         sessionStorage.setItem('sessionId', sessionId);
         const AUTOSAVE_KEY = `stet_paper2_${selectedSet}_${sessionId}`;
+        
+        // Add set validation info to page
+        document.title = `STET 2025 - Paper-II (${selectedSet.toUpperCase()}) - Exam`;
+        
+        // Add visual indicator for current set
+        const style = document.createElement('style');
+        style.textContent = `
+            .exam-header::after {
+                content: "${selectedSet.toUpperCase()}";
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: rgba(255,255,255,0.2);
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 12px;
+                font-weight: bold;
+            }
+        `;
+        document.head.appendChild(style);
 
         function loadSavedData() {
             const saved = sessionStorage.getItem(AUTOSAVE_KEY);
@@ -525,7 +565,7 @@
                     sessionStorage.setItem('selectedSet', selectedSet);
                     sessionStorage.setItem('examCompletedAt', new Date().toISOString());
                     
-                    // Enhanced history entry
+                    // Enhanced history entry with set validation
                     const history = JSON.parse(localStorage.getItem('testHistory') || '[]');
                     const historyEntry = {
                         paper: 'Paper-II',
@@ -541,7 +581,15 @@
                         detailedResults: detailedResults,
                         examDuration: 150 * 60 - timeRemaining,
                         candidateName: sessionStorage.getItem('candidateName'),
-                        rollNumber: sessionStorage.getItem('rollNumber')
+                        rollNumber: sessionStorage.getItem('rollNumber'),
+                        questionBankSize: questionBank.length,
+                        firstQuestionPreview: questionBank[0]?.question?.substring(0, 50) + '...',
+                        lastQuestionPreview: questionBank[questionBank.length - 1]?.question?.substring(0, 50) + '...',
+                        setValidation: {
+                            totalQuestions: questionBank.length,
+                            uniqueIds: new Set(questionBank.map(q => q.id)).size,
+                            isValid: new Set(questionBank.map(q => q.id)).size === questionBank.length
+                        }
                     };
                     
                     history.push(historyEntry);

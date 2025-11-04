@@ -87,7 +87,11 @@ y-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0
                 <button class="filter-btn active" onclick="filterTests('all')">All Tests</button>
                 <button class="filter-btn" onclick="filterTests('Paper-I')">Paper-I Only</button>
                 <button class="filter-btn" onclick="filterTests('Paper-II')">Paper-II Only</button>
-                <input type="text" class="search-box" placeholder="Search by date or score..." onkeyup="searchTests(this.value)">
+                <button class="filter-btn" onclick="filterBySet('set1')">Set 1</button>
+                <button class="filter-btn" onclick="filterBySet('newset')">Set 2</button>
+                <button class="filter-btn" onclick="filterBySet('set3')">Set 3</button>
+                <button class="filter-btn" onclick="filterBySet('set4')">Set 4+</button>
+                <input type="text" class="search-box" placeholder="Search by date, score, set..." onkeyup="searchTests(this.value)">
                 <select onchange="sortTests(this.value)" style="padding: 8px; border-radius: 4px;">
                     <option value="date-desc">Latest First</option>
                     <option value="date-asc">Oldest First</option>
@@ -141,19 +145,31 @@ y-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0
                     return;
                 }
                 
-                const paper1Count = history.filter(h => h.paper === 'Paper-I').length;
-                const paper2Count = history.filter(h => h.paper === 'Paper-II').length;
-                const avgScore = Math.round(history.reduce((sum, h) => sum + h.percentage, 0) / history.length);
-                const bestScore = Math.max(...history.map(h => h.percentage));
+                // Validate and clean history data
+                const cleanHistory = history.map(h => ({
+                    ...h,
+                    set: h.set || 'set1', // Default to set1 if missing
+                    sessionId: h.sessionId || Date.now(), // Add session ID if missing
+                    paper: h.paper || 'Paper-I' // Default paper if missing
+                }));
+                
+                const paper1Count = cleanHistory.filter(h => h.paper === 'Paper-I').length;
+                const paper2Count = cleanHistory.filter(h => h.paper === 'Paper-II').length;
+                const avgScore = Math.round(cleanHistory.reduce((sum, h) => sum + h.percentage, 0) / cleanHistory.length);
+                const bestScore = Math.max(...cleanHistory.map(h => h.percentage));
 
-                document.getElementById('totalTests').textContent = history.length;
+                document.getElementById('totalTests').textContent = cleanHistory.length;
                 document.getElementById('paper1Tests').textContent = paper1Count;
                 document.getElementById('paper2Tests').textContent = paper2Count;
                 document.getElementById('avgScore').textContent = avgScore + '%';
                 document.getElementById('bestScore').textContent = bestScore + '%';
 
-                window.allHistory = history;
-                window.filteredHistory = [...history];
+                window.allHistory = cleanHistory;
+                window.filteredHistory = [...cleanHistory];
+                
+                // Save cleaned history back
+                localStorage.setItem('testHistory', JSON.stringify(cleanHistory));
+                
                 renderTable();
             } catch (error) {
                 console.error('Failed to load history:', error);
@@ -189,15 +205,15 @@ y-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0
         
         function getSetDisplayName(set) {
             const setNames = {
-                'set1': 'Set 1',
-                'newset': 'Set 2',
-                'set3': 'Set 3',
-                'set4': 'Set 4',
-                'set5': 'Set 5',
-                'set6': 'Set 6',
-                'set7': 'Set 7'
+                'set1': 'Set 1 (Original)',
+                'newset': 'Set 2 (New)',
+                'set3': 'Set 3 (Fresh)',
+                'set4': 'Set 4 (Latest)',
+                'set5': 'Set 5 (Enhanced)',
+                'set6': 'Set 6 (Premium)',
+                'set7': 'Set 7 (Advanced)'
             };
-            return setNames[set] || set.toUpperCase();
+            return setNames[set] || `Set ${set.toUpperCase()}`;
         }
 
         function renderTable() {
@@ -214,13 +230,15 @@ y-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0
                 const badgeClass = h.paper === 'Paper-I' ? 'badge-paper1' : 'badge-paper2';
                 const grade = h.grade || (h.percentage >= 60 ? 'A' : h.percentage >= 50 ? 'B' : h.percentage >= 40 ? 'C' : 'F');
                 const duration = h.examDuration ? formatDuration(h.examDuration) : 'N/A';
+                const setDisplay = getSetDisplayName(h.set);
+                const sessionInfo = h.sessionId ? `<br><small style="color: #888; font-size: 10px;">Session: ${h.sessionId.toString().slice(-6)}</small>` : '';
                 
                 return `
-                    <tr data-paper="${h.paper}" data-score="${h.percentage}" data-date="${h.timestamp}">
+                    <tr data-paper="${h.paper}" data-score="${h.percentage}" data-date="${h.timestamp}" data-set="${h.set}">
                         <td>${i + 1}</td>
-                        <td>${new Date(h.timestamp).toLocaleString()}<br><small style="color: #999;">${duration}</small></td>
+                        <td>${new Date(h.timestamp).toLocaleString()}<br><small style="color: #999;">${duration}</small>${sessionInfo}</td>
                         <td><span class="badge ${badgeClass}">${h.paper}</span></td>
-                        <td>${getSetDisplayName(h.set)}</td>
+                        <td><strong>${setDisplay}</strong><br><small style="color: #666; font-size: 11px;">${h.set}</small></td>
                         <td class="${scoreClass}">
                             ${h.correct}/150
                             <div class="progress-bar">
@@ -258,6 +276,20 @@ y-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0
             renderTable();
         }
         
+        function filterBySet(setType) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (setType === 'set4+') {
+                window.filteredHistory = window.allHistory.filter(h => 
+                    ['set4', 'set5', 'set6', 'set7'].includes(h.set)
+                );
+            } else {
+                window.filteredHistory = window.allHistory.filter(h => h.set === setType);
+            }
+            renderTable();
+        }
+        
         function searchTests(query) {
             if (!query.trim()) {
                 window.filteredHistory = [...window.allHistory];
@@ -267,7 +299,8 @@ y-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0
                     new Date(h.timestamp).toLocaleString().toLowerCase().includes(searchTerm) ||
                     h.percentage.toString().includes(searchTerm) ||
                     h.paper.toLowerCase().includes(searchTerm) ||
-                    getSetDisplayName(h.set).toLowerCase().includes(searchTerm)
+                    getSetDisplayName(h.set).toLowerCase().includes(searchTerm) ||
+                    h.set.toLowerCase().includes(searchTerm)
                 );
             }
             renderTable();
@@ -316,13 +349,31 @@ y-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0
         }
         
         function deleteTest(index) {
-            const history = JSON.parse(localStorage.getItem('testHistory') || '[]');
-            const test = history[index];
+            const test = window.allHistory[index];
             
-            if (confirm(`Delete this test record?\n\nPaper: ${test.paper}\nScore: ${test.correct}/150 (${test.percentage}%)\nDate: ${new Date(test.timestamp).toLocaleString()}`)) {
-                history.splice(index, 1);
-                localStorage.setItem('testHistory', JSON.stringify(history));
-                loadHistory();
+            if (!test) {
+                alert('Test data not found!');
+                return;
+            }
+            
+            const setDisplay = getSetDisplayName(test.set);
+            const confirmMsg = `Delete this test record?\n\nPaper: ${test.paper}\nSet: ${setDisplay}\nScore: ${test.correct}/150 (${test.percentage}%)\nDate: ${new Date(test.timestamp).toLocaleString()}\n\nThis action cannot be undone.`;
+            
+            if (confirm(confirmMsg)) {
+                // Remove from original history array
+                const allHistory = JSON.parse(localStorage.getItem('testHistory') || '[]');
+                const originalIndex = allHistory.findIndex(h => 
+                    h.timestamp === test.timestamp && 
+                    h.sessionId === test.sessionId
+                );
+                
+                if (originalIndex !== -1) {
+                    allHistory.splice(originalIndex, 1);
+                    localStorage.setItem('testHistory', JSON.stringify(allHistory));
+                    loadHistory();
+                } else {
+                    alert('Error: Could not find test record to delete.');
+                }
             }
         }
         
@@ -350,26 +401,34 @@ y-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0
         }
         
         function viewDetails(index) {
-            const history = JSON.parse(localStorage.getItem('testHistory') || '[]');
-            const test = history[index];
+            const test = window.allHistory[index];
             
+            if (!test) {
+                alert('Test data not found!');
+                return;
+            }
+            
+            // Store comprehensive test data for viewing
             sessionStorage.setItem('viewHistoryData', JSON.stringify(test));
             sessionStorage.setItem('viewingFromHistory', 'true');
+            sessionStorage.setItem('selectedSet', test.set || 'set1');
             
             if (test.paper === 'Paper-I') {
                 sessionStorage.setItem('paper1Correct', test.correct);
                 sessionStorage.setItem('paper1Wrong', test.wrong);
                 sessionStorage.setItem('paper1NotAnswered', test.notAnswered);
-                sessionStorage.setItem('selectedSet', test.set);
+                sessionStorage.setItem('paper1Percentage', test.percentage);
                 if (test.userAnswers) sessionStorage.setItem('paper1UserAnswers', JSON.stringify(test.userAnswers));
-                window.location.href = 'paper1_result.html?history=true';
+                if (test.detailedResults) sessionStorage.setItem('paper1DetailedResults', JSON.stringify(test.detailedResults));
+                window.location.href = 'paper1_result.html?history=true&set=' + (test.set || 'set1');
             } else {
                 sessionStorage.setItem('paper2Correct', test.correct);
                 sessionStorage.setItem('paper2Wrong', test.wrong);
                 sessionStorage.setItem('paper2NotAnswered', test.notAnswered);
-                sessionStorage.setItem('selectedSet', test.set);
+                sessionStorage.setItem('paper2Percentage', test.percentage);
                 if (test.userAnswers) sessionStorage.setItem('paper2UserAnswers', JSON.stringify(test.userAnswers));
-                window.location.href = 'paper2_result.html?history=true';
+                if (test.detailedResults) sessionStorage.setItem('paper2DetailedResults', JSON.stringify(test.detailedResults));
+                window.location.href = 'paper2_result.html?history=true&set=' + (test.set || 'set1');
             }
         }
 
