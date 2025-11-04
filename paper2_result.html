@@ -340,7 +340,15 @@
             document.getElementById('btnEnglish').classList.remove('active');
             document.getElementById('btnHindi').classList.remove('active');
             document.getElementById('btnBoth').classList.remove('active');
-            document.getElementById('btn' + lang.charAt(0).toUpperCase() + lang.slice(1)).classList.add('active');
+            
+            // Correctly map language to button ID
+            if (lang === 'english') {
+                document.getElementById('btnEnglish').classList.add('active');
+            } else if (lang === 'hindi') {
+                document.getElementById('btnHindi').classList.add('active');
+            } else {
+                document.getElementById('btnBoth').classList.add('active');
+            }
             
             // Reload detailed analysis if visible
             if (detailedAnalysisVisible) {
@@ -397,36 +405,82 @@
                 }
             }
             
-            // Fallback to original question banks
+            // Fallback to original question banks (always use original for history)
             if (!questionBank) {
                 const selectedSet = sessionStorage.getItem('selectedSet') || 'set1';
+                const isViewingFromHistory = sessionStorage.getItem('viewingFromHistory') === 'true';
+                
                 try {
                     switch(selectedSet) {
                         case 'newset':
-                            questionBank = window.paper2NewSetQuestions || paper2NewSetQuestions;
+                            questionBank = (typeof paper2NewSetQuestions !== 'undefined') ? paper2NewSetQuestions : 
+                                          (window.paper2NewSetQuestions || null);
                             break;
                         case 'set3':
-                            questionBank = window.paper2Set3NewQuestions || paper2Set3NewQuestions;
+                            questionBank = (typeof paper2Set3NewQuestions !== 'undefined') ? paper2Set3NewQuestions : 
+                                          (window.paper2Set3NewQuestions || null);
                             break;
                         case 'set4':
-                            questionBank = window.paper2Set4CompleteQuestions || paper2Set4CompleteQuestions;
+                            questionBank = (typeof paper2Set4CompleteQuestions !== 'undefined') ? paper2Set4CompleteQuestions : 
+                                          (window.paper2Set4CompleteQuestions || null);
                             break;
                         case 'set5':
-                            questionBank = window.paper2Set5EnhancedQuestions || paper2Set5EnhancedQuestions;
+                            questionBank = (typeof paper2Set5EnhancedQuestions !== 'undefined') ? paper2Set5EnhancedQuestions : 
+                                          (window.paper2Set5EnhancedQuestions || null);
                             break;
                         case 'set6':
-                            questionBank = window.paper2Set6CompleteQuestions || paper2Set6CompleteQuestions;
+                            questionBank = (typeof paper2Set6CompleteQuestions !== 'undefined') ? paper2Set6CompleteQuestions : 
+                                          (window.paper2Set6CompleteQuestions || null);
                             break;
                         case 'set7':
-                            questionBank = window.paper2Set7CompleteQuestions || paper2Set7CompleteQuestions;
+                            questionBank = (typeof paper2Set7CompleteQuestions !== 'undefined') ? paper2Set7CompleteQuestions : 
+                                          (window.paper2Set7CompleteQuestions || null);
                             break;
                         default:
-                            questionBank = window.paper2Questions || paper2Questions;
+                            questionBank = (typeof paper2Questions !== 'undefined') ? paper2Questions : 
+                                          (window.paper2Questions || null);
+                    }
+                    
+                    // For history view, always use original questions (no shuffling)
+                    if (isViewingFromHistory && questionBank) {
+                        console.log('Using original question order for history view');
+                        // Clear the viewing flag after use
+                        sessionStorage.removeItem('viewingFromHistory');
                     }
                 } catch (e) {
                     console.error('Failed to load question bank:', e);
                 }
             }
+            
+            // Additional fallback: try to load any available question bank
+            if (!questionBank) {
+                const availableBanks = [
+                    'paper2Questions', 'paper2NewSetQuestions', 'paper2Set3NewQuestions',
+                    'paper2Set4CompleteQuestions', 'paper2Set5EnhancedQuestions', 
+                    'paper2Set6CompleteQuestions', 'paper2Set7CompleteQuestions'
+                ];
+                
+                for (const bankName of availableBanks) {
+                    try {
+                        if (typeof window[bankName] !== 'undefined' && window[bankName]) {
+                            questionBank = window[bankName];
+                            console.log(`Loaded fallback question bank: ${bankName}`);
+                            break;
+                        }
+                    } catch (e) {
+                        continue;
+                    }
+                }
+            }
+            
+            // Debug information
+            console.log('Question bank status:', {
+                questionBank: questionBank ? 'Found' : 'Not found',
+                length: questionBank ? questionBank.length : 0,
+                selectedSet: sessionStorage.getItem('selectedSet'),
+                sessionId: sessionId,
+                userAnswers: Object.keys(userAnswers).length
+            });
             
             if (!questionBank || questionBank.length === 0) {
                 questionsContainer.innerHTML = `
@@ -434,6 +488,13 @@
                         <h3>⚠️ Question Data Not Available</h3>
                         <p>The detailed analysis cannot be displayed because the question data is not available.</p>
                         <p>This may happen if you cleared your browser data or the session expired.</p>
+                        <div style="margin: 20px 0; padding: 15px; background: #f0f0f0; border-radius: 5px; font-size: 12px; text-align: left;">
+                            <strong>Debug Info:</strong><br>
+                            Selected Set: ${sessionStorage.getItem('selectedSet') || 'Not set'}<br>
+                            Session ID: ${sessionId || 'Not set'}<br>
+                            User Answers: ${Object.keys(userAnswers).length} found<br>
+                            Available Scripts: ${document.querySelectorAll('script[src*="paper2"]').length}
+                        </div>
                         <button onclick="window.location.href='paper_selection.html'" style="margin-top: 20px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Return to Paper Selection</button>
                     </div>
                 `;
@@ -443,7 +504,9 @@
             questionsContainer.innerHTML = '';
             
             questionBank.forEach((question, index) => {
-                const userAnswer = userAnswers[question.id];
+                // Handle different question ID formats
+                const questionId = question.id || question.questionId || index;
+                const userAnswer = userAnswers[questionId] !== undefined ? userAnswers[questionId] : userAnswers[index];
                 const isCorrect = userAnswer === question.correct;
                 const isAttempted = userAnswer !== undefined;
                 

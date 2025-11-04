@@ -354,6 +354,7 @@ y-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0
             const test = history[index];
             
             sessionStorage.setItem('viewHistoryData', JSON.stringify(test));
+            sessionStorage.setItem('viewingFromHistory', 'true');
             
             if (test.paper === 'Paper-I') {
                 sessionStorage.setItem('paper1Correct', test.correct);
